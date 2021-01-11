@@ -56,7 +56,15 @@ namespace RedditToTelegram
         static void VideoDownload(string url)
         {
             var youtubeDl = new YoutubeDL();
-            youtubeDl.YoutubeDlPath = "./tools/youtube-dl.exe";
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                youtubeDl.YoutubeDlPath = "./tools/youtube-dl.exe";
+            }
+            else
+            {
+                youtubeDl.YoutubeDlPath = "./tools/youtube-dl";         
+            }
+
             youtubeDl.Options.FilesystemOptions.Output = "./video.mp4";
             youtubeDl.VideoUrl = "https://reddit.com" + url;
             Console.WriteLine("https://reddit.com" + url);
@@ -76,11 +84,11 @@ namespace RedditToTelegram
                     Directory.CreateDirectory("./tools");
                 }
                 Console.WriteLine("Check if youtube-dl exist...");
-                if (!System.IO.File.Exists("./tools/youtube-dl.exe"))
+                if (!(System.IO.File.Exists("./tools/youtube-dl.exe") || System.IO.File.Exists("./tools/youtube-dl")))
                 {
 
                     Console.WriteLine("Download of Youtube-dl");
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     {
                         client.DownloadFile("https://yt-dl.org/downloads/2021.01.08/youtube-dl.exe", "./tools/youtube-dl.exe");
                     }
