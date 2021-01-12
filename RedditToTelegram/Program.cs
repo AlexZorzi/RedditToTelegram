@@ -21,7 +21,7 @@ namespace RedditToTelegram
         public string refreshToken { get; set; }
         public string SUBREDDIT { get; set; }
         public string BOT_TOKEN { get; set; }
-        public string chatId { get; set; }
+        public Int64 chatId { get; set; }
         public bool Hot { get; set; }
 
     }
@@ -36,13 +36,12 @@ namespace RedditToTelegram
                 credentials = JsonConvert.DeserializeObject<credentials>(json);
             }
 
-            
             CheckTools();
             var r = new RedditClient(appId: Convert.ToString(credentials.appId), appSecret: Convert.ToString(credentials.appSecret),
                 refreshToken: Convert.ToString(credentials.refreshToken));
             var sub = r.Subreddit(Convert.ToString(credentials.SUBREDDIT));
 
-            Console.WriteLine("Waiting for posts...");
+            
             if (credentials.Hot)
             {
                 _ = sub.Posts.GetHot();
