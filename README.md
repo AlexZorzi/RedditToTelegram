@@ -18,6 +18,17 @@ LINUX:
 -chmod 777 the ./tools/youtube-dl file
 
 ```
+place a file called `credentials.json` with the bot and reddit credentials using this format
+```
+{
+  "appId": "appId",
+  "appSecret": "appSecret",
+  "refreshToken": "refreshToken",
+  "SUBREDDIT": "SUBREDDIT",
+  "BOT_TOKEN": "BOT_TOKEN",
+  "chatId": "chatId",
+}
+```
 
 # TODO
 - Nicer Implementation

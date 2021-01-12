@@ -1,3 +1,4 @@
 RedditToTelegram/bin
 RedditToTelegram/obj
 .vs
+*.json

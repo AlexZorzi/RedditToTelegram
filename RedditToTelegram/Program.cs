@@ -10,16 +10,36 @@ using Telegram.Bot.Types;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace RedditToTelegram
 {
+    public class credentials
+    {
+        public string appId { get; set; }
+        public string appSecret { get; set; }
+        public string refreshToken { get; set; }
+        public string SUBREDDIT { get; set; }
+        public string BOT_TOKEN { get; set; }
+        public string chatId { get; set; }
+
+    }
     class Program
     {
         static void Main(string[] args)
         {
+            credentials credentials;
+            using (StreamReader stream = new StreamReader("credentials.json"))
+            {
+                string json = stream.ReadToEnd();
+                credentials = JsonConvert.DeserializeObject<credentials>(json);
+            }
+
+            
             CheckTools();
-            //var r = new RedditClient(appId: "APPId", appSecret: "APP_SECRET", refreshToken: "REFRESH_TOKEN");
-            //var sub = r.Subreddit("SUBREDDIT");
+            var r = new RedditClient(appId: Convert.ToString(credentials.appId), appSecret: Convert.ToString(credentials.appSecret),
+                refreshToken: Convert.ToString(credentials.refreshToken));
+            var sub = r.Subreddit(Convert.ToString(credentials.SUBREDDIT));
 
             Console.WriteLine("Waiting for posts...");
                 _ = sub.Posts.GetHot();
@@ -29,21 +49,27 @@ namespace RedditToTelegram
     
         public static async void C_HotpostsUpdated(object sender, PostsUpdateEventArgs e)
         {
-            //TelegramBotClient botClient = new TelegramBotClient("YOUR_BOT_TOKEN");
+            credentials credentials;
+            using (StreamReader stream = new StreamReader("credentials.json"))
+            {
+                string json = stream.ReadToEnd();
+                credentials = JsonConvert.DeserializeObject<credentials>(json);
+            }
+            TelegramBotClient botClient = new TelegramBotClient(credentials.BOT_TOKEN);
 
             foreach (var post in e.Added)
             {
                 if (!post.Listing.IsVideo && post.Listing.IsRedditMediaDomain)
                 {
                     Console.WriteLine(post.Listing.URL);
-                    //botClient.SendPhotoAsync(chatId: INT_CHAT_ID , photo: post.Listing.URL, caption: post.Title);
+                    botClient.SendPhotoAsync(chatId: credentials.chatId , photo: post.Listing.URL, caption: post.Title);
 
                 }
                 else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain)
                 {
                     VideoDownload(post.Listing.Permalink);
                     var file = System.IO.File.OpenRead("./video.mp4");
-                    //Message msg = await botClient.SendVideoAsync(chatId: INT_ID, video: file, caption: post.Title, supportsStreaming:true);
+                    Message msg = await botClient.SendVideoAsync(chatId: credentials.chatId, video: file, caption: post.Title, supportsStreaming:true);
                     file.Close();
                     Console.WriteLine("Video Sent!");
                     Console.WriteLine("Deleting local file...");
