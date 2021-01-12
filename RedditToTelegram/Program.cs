@@ -9,6 +9,7 @@ using NYoutubeDL;
 using Telegram.Bot.Types;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace RedditToTelegram
 {
@@ -21,12 +22,11 @@ namespace RedditToTelegram
             //var sub = r.Subreddit("SUBREDDIT");
 
             Console.WriteLine("Waiting for posts...");
-                sub.Posts.GetHot();
+                _ = sub.Posts.GetHot();
                 sub.Posts.HotUpdated += C_HotpostsUpdated;
                 sub.Posts.MonitorHot();
-
         }
-
+    
         public static async void C_HotpostsUpdated(object sender, PostsUpdateEventArgs e)
         {
             //TelegramBotClient botClient = new TelegramBotClient("YOUR_BOT_TOKEN");
@@ -38,7 +38,8 @@ namespace RedditToTelegram
                     Console.WriteLine(post.Listing.URL);
                     //botClient.SendPhotoAsync(chatId: INT_CHAT_ID , photo: post.Listing.URL, caption: post.Title);
 
-                }else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain)
+                }
+                else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain)
                 {
                     VideoDownload(post.Listing.Permalink);
                     var file = System.IO.File.OpenRead("./video.mp4");
