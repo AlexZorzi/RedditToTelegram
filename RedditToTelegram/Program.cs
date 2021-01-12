@@ -22,6 +22,7 @@ namespace RedditToTelegram
         public string SUBREDDIT { get; set; }
         public string BOT_TOKEN { get; set; }
         public string chatId { get; set; }
+        public bool Hot { get; set; }
 
     }
     class Program
@@ -42,12 +43,22 @@ namespace RedditToTelegram
             var sub = r.Subreddit(Convert.ToString(credentials.SUBREDDIT));
 
             Console.WriteLine("Waiting for posts...");
+            if (credentials.Hot)
+            {
                 _ = sub.Posts.GetHot();
-                sub.Posts.HotUpdated += C_HotpostsUpdated;
+                sub.Posts.HotUpdated += C_postsUpdated;
                 sub.Posts.MonitorHot();
+            }
+            else
+            {
+                _ = sub.Posts.GetNew();
+                sub.Posts.NewUpdated += C_postsUpdated;
+                sub.Posts.MonitorNew();
+            }
+               
         }
     
-        public static async void C_HotpostsUpdated(object sender, PostsUpdateEventArgs e)
+        public static async void C_postsUpdated(object sender, PostsUpdateEventArgs e)
         {
             credentials credentials;
             using (StreamReader stream = new StreamReader("credentials.json"))

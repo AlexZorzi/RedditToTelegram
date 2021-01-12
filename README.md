@@ -27,8 +27,6 @@ place a file called `credentials.json` with the bot and reddit credentials using
   "SUBREDDIT": "SUBREDDIT",
   "BOT_TOKEN": "BOT_TOKEN",
   "chatId": "chatId",
+  "Hot": true    (false is by new)
 }
 ```
-
-# TODO
-- Nicer Implementation
