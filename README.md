@@ -13,8 +13,9 @@ just launch RedditToTelegram.exe, it should download Youtube-dl and FFmpeg autom
 ```
 LINUX:
 ```
-install ffmpeg with apt, youtube-dl will be downloaded automatically
-you also need python installed
+-install ffmpeg with apt ( youtube-dl will be downloaded automatically )
+-python installed
+-chmod 777 the ./tools/youtube-dl file
 
 ```
 
