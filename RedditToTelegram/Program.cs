@@ -27,7 +27,17 @@ namespace RedditToTelegram
     }
     class Program
     {
+        List<string> Cache; //using list because of .RemoveAt
+
         static void Main(string[] args)
+        {
+            Program entry = new Program();
+            List<string> lists = new List<string>();
+            entry.Cache = lists;
+            entry.init();
+               
+        }
+        public void init()
         {
             credentials credentials;
             using (StreamReader stream = new StreamReader("credentials.json"))
@@ -41,24 +51,26 @@ namespace RedditToTelegram
                 refreshToken: Convert.ToString(credentials.refreshToken));
             var sub = r.Subreddit(Convert.ToString(credentials.SUBREDDIT));
 
-            
+            Console.WriteLine("waiting for posts...");
             if (credentials.Hot)
             {
+                Console.WriteLine("HOT");
                 _ = sub.Posts.GetHot();
                 sub.Posts.HotUpdated += C_postsUpdated;
                 sub.Posts.MonitorHot();
             }
             else
             {
+                Console.WriteLine("NEW");
                 _ = sub.Posts.GetNew();
                 sub.Posts.NewUpdated += C_postsUpdated;
                 sub.Posts.MonitorNew();
             }
-               
         }
-    
-        public static async void C_postsUpdated(object sender, PostsUpdateEventArgs e)
+
+            public async void C_postsUpdated(object sender, PostsUpdateEventArgs e)
         {
+            
             credentials credentials;
             using (StreamReader stream = new StreamReader("credentials.json"))
             {
@@ -69,13 +81,13 @@ namespace RedditToTelegram
 
             foreach (var post in e.Added)
             {
-                if (!post.Listing.IsVideo && post.Listing.IsRedditMediaDomain)
+                if (!post.Listing.IsVideo && post.Listing.IsRedditMediaDomain && !InCache(post.Permalink))
                 {
                     Console.WriteLine(post.Listing.URL);
                     botClient.SendPhotoAsync(chatId: credentials.chatId , photo: post.Listing.URL, caption: post.Title);
 
                 }
-                else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain)
+                else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain && !InCache(post.Permalink))
                 {
                     VideoDownload(post.Listing.Permalink);
                     var file = System.IO.File.OpenRead("./video.mp4");
@@ -88,6 +100,24 @@ namespace RedditToTelegram
                 }
 
 
+            }
+        }
+        private bool InCache(string url)
+        {
+            if (Cache.Contains(url))
+            {
+                Console.WriteLine(url, "In Cache");
+                if(Cache.Count >= 32)
+                {
+                    Cache.RemoveAt(0);
+                }
+                return true;
+            }
+            else
+            {
+                Console.WriteLine(url, "Not in Cache");
+                Cache.Add(url);
+                return false;
             }
         }
         static void VideoDownload(string url)
