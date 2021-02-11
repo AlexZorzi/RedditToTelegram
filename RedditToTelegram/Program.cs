@@ -89,13 +89,13 @@ namespace RedditToTelegram
                 }
                 else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain && !InCache(post.Permalink))
                 {
-                    VideoDownload(post.Listing.Permalink);
-                    var file = System.IO.File.OpenRead("./video.mp4");
+                    string filename = VideoDownload(post.Listing.Permalink);
+                    var file = System.IO.File.OpenRead("./"+filename);
                     Message msg = await botClient.SendVideoAsync(chatId: credentials.chatId, video: file, caption: post.Title, supportsStreaming:true);
                     file.Close();
                     Console.WriteLine("Video Sent!");
                     Console.WriteLine("Deleting local file...");
-                    System.IO.File.Delete("./video.mp4");
+                    System.IO.File.Delete("./"+filename);
                   
                 }
 
@@ -120,7 +120,7 @@ namespace RedditToTelegram
                 return false;
             }
         }
-        static void VideoDownload(string url)
+        static string VideoDownload(string url)
         {
             var youtubeDl = new YoutubeDL();
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -131,8 +131,8 @@ namespace RedditToTelegram
             {
                 youtubeDl.YoutubeDlPath = "./tools/youtube-dl";         
             }
-
-            youtubeDl.Options.FilesystemOptions.Output = "./video.mp4";
+            string filename = url.Split("/")[url.Split("/").Length-2]+".mp4";
+            youtubeDl.Options.FilesystemOptions.Output = filename;
             youtubeDl.VideoUrl = "https://reddit.com" + url;
             Console.WriteLine("https://reddit.com" + url);
             youtubeDl.StandardOutputEvent += (sender, output) => Console.WriteLine(output);
@@ -140,6 +140,7 @@ namespace RedditToTelegram
             string commandToRun = youtubeDl.PrepareDownload();
             youtubeDl.Download();
             youtubeDl = null;
+            return filename;
         }
 
         static void CheckTools()
