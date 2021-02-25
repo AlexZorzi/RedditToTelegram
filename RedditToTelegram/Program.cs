@@ -23,6 +23,7 @@ namespace RedditToTelegram
         public string BOT_TOKEN { get; set; }
         public Int64 chatId { get; set; }
         public bool Hot { get; set; }
+        public Int64 minUpvote { get; set; }
 
     }
     class Program
@@ -50,7 +51,11 @@ namespace RedditToTelegram
             var r = new RedditClient(appId: Convert.ToString(credentials.appId), appSecret: Convert.ToString(credentials.appSecret),
                 refreshToken: Convert.ToString(credentials.refreshToken));
             var sub = r.Subreddit(Convert.ToString(credentials.SUBREDDIT));
-
+            Console.WriteLine("Subreddit: "+credentials.SUBREDDIT);
+            Console.WriteLine("chatID: "+credentials.chatId);
+            Console.WriteLine("APIid: "+credentials.appId);
+            Console.WriteLine("APIsecret: "+credentials.appSecret);
+            Console.WriteLine("Minimum UpVotes: "+credentials.minUpvote);
             Console.WriteLine("waiting for posts...");
             if (credentials.Hot)
             {
@@ -81,22 +86,28 @@ namespace RedditToTelegram
 
             foreach (var post in e.Added)
             {
-                if (!post.Listing.IsVideo && post.Listing.IsRedditMediaDomain && !InCache(post.Permalink))
-                {
-                    Console.WriteLine(post.Listing.URL);
-                    botClient.SendPhotoAsync(chatId: credentials.chatId , photo: post.Listing.URL, caption: post.Title);
+                Console.WriteLine(post.Title);
+                Console.WriteLine(post.UpVotes);
 
-                }
-                else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain && !InCache(post.Permalink))
-                {
-                    string filename = VideoDownload(post.Listing.Permalink);
-                    var file = System.IO.File.OpenRead("./"+filename);
-                    Message msg = await botClient.SendVideoAsync(chatId: credentials.chatId, video: file, caption: post.Title, supportsStreaming:true);
-                    file.Close();
-                    Console.WriteLine("Video Sent!");
-                    Console.WriteLine("Deleting local file...");
-                    System.IO.File.Delete("./"+filename);
-                  
+                if(post.UpVotes >= credentials.minUpvote){
+
+                    if (!post.Listing.IsVideo && post.Listing.IsRedditMediaDomain && !InCache(post.Permalink))
+                    {
+                        Console.WriteLine(post.Listing.URL);
+                        await botClient.SendPhotoAsync(chatId: credentials.chatId , photo: post.Listing.URL, caption: post.Title);
+
+                    }
+                    else if (post.Listing.IsVideo && post.Listing.IsRedditMediaDomain && !InCache(post.Permalink))
+                    {
+                        string filename = VideoDownload(post.Listing.Permalink);
+                        var file = System.IO.File.OpenRead("./"+filename);
+                        Message msg = await botClient.SendVideoAsync(chatId: credentials.chatId, video: file, caption: post.Title, supportsStreaming:true);
+                        file.Close();
+                        Console.WriteLine("Video Sent!");
+                        Console.WriteLine("Deleting local file...");
+                        System.IO.File.Delete("./"+filename);
+                    
+                    }
                 }
 
 
