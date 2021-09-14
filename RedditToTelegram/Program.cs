@@ -167,9 +167,9 @@ namespace RedditToTelegram
                 {
 
                     Console.WriteLine("Download of Youtube-dl");
-                    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        client.DownloadFile("https://yt-dl.org/downloads/2021.01.08/youtube-dl.exe", "./tools/youtube-dl.exe");
+                        client.DownloadFile("https://yt-dl.org/downloads/2021.06.06/youtube-dl.exe", "./tools/youtube-dl.exe");
                     }
                     else
                     {
@@ -179,7 +179,7 @@ namespace RedditToTelegram
                     Console.WriteLine("Done with youtube-dl");
                 }
                 Console.WriteLine("Check if ffmpeg exist...");
-                if (!System.IO.File.Exists("./tools/ffmpeg.exe") && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                if (!System.IO.File.Exists("./tools/ffmpeg.exe") && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     Console.WriteLine("Downloading ffmpeg.exe, might take some time");
                     client.DownloadFile("https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip", "./tools/ffmpeg.zip");
