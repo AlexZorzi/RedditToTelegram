@@ -169,7 +169,7 @@ namespace RedditToTelegram
                     Console.WriteLine("Download of Youtube-dl");
                     if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     {
-                        client.DownloadFile("https://yt-dl.org/downloads/2021.01.08/youtube-dl.exe", "./tools/youtube-dl.exe");
+                        client.DownloadFile("https://yt-dl.org/downloads/2021.06.06/youtube-dl.exe", "./tools/youtube-dl.exe");
                     }
                     else
                     {
